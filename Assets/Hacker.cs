@@ -4,8 +4,14 @@ using UnityEngine;
 
 public class Hacker : MonoBehaviour
 {
+    // Game configuration data
+    string[] level1Passwords = { "books", "aisle", "shelf", "password", "font", "borrow" };
+    string[] level2Passwords = { "prisoner", "handcuffs", "holster", "uniform", "arrest" };
+    string[] level3Passwords = { "starfield", "telescope", "environment", "exploration", "astronauts" };
+
     // Game State
     int level;
+    string password;
     enum Screen { MainMenu, Password, Win };
     Screen curScreen;
 
@@ -17,7 +23,7 @@ public class Hacker : MonoBehaviour
     
     void ShowMainMenu()
     {
-        Screen curScreen = Screen.MainMenu;
+        curScreen = Screen.MainMenu;
         Terminal.ClearScreen();
         Terminal.WriteLine("**WARNING: DO NOT PROCEED**");
         Terminal.WriteLine("If you really want to proceed.... :)");
@@ -33,6 +39,7 @@ public class Hacker : MonoBehaviour
         print(input);
         if (input.ToLower() == "menu")
         {
+            curScreen = Screen.MainMenu;
             ShowMainMenu();
         }
         else if(curScreen == Screen.MainMenu)
@@ -48,19 +55,10 @@ public class Hacker : MonoBehaviour
 
     void RunMainMenu(string input)
     {
-        if (input == "1")
+        bool isLevelInputValid = (input == "1" || input == "2" || input == "3");
+        if (isLevelInputValid)
         {
-            level = 1;
-            StartGame();
-        }
-        else if (input == "2")
-        {
-            level = 2;
-            StartGame();
-        }
-        else if (input == "3")
-        {
-            level = 3;
+            level = int.Parse(input);
             StartGame();
         }
         else if (input == "007")
@@ -83,19 +81,75 @@ public class Hacker : MonoBehaviour
 
     void RunCheckPassword(string input)
     {
-        
+        if(input != password)
+        {
+            Terminal.WriteLine("Wrong password! Please try again...");
+        }
+        else
+        {
+            ShowWinScreen();
+        }
+    }
+
+    void ShowWinScreen()
+    {
+        curScreen = Screen.Win;
+        Terminal.ClearScreen();
+        ShowLevelReward();
+    }
+
+    void ShowLevelReward()
+    {
+        switch (level)
+        {
+            case 1:
+                Terminal.WriteLine("Have a book...");
+                Terminal.WriteLine(@"
+    ________
+   /       //
+  /       //
+ /       //
+(_______(/
+                ");
+                break;
+            case 2:
+                Terminal.WriteLine("Have a key...");
+                Terminal.WriteLine(@"
+ ___
+/ 0 \___________
+\___/---\/=\/-\/           
+                ");
+                break;
+            case 3:
+                Terminal.WriteLine("Have a rocket...");
+                break;
+            default:
+                Debug.LogError("You have been surrounded :)");
+                break;
+        }
+        Terminal.WriteLine("Log in successful!");
     }
 
     void StartGame()
     {
         curScreen = Screen.Password;
-        Terminal.WriteLine("You've seleceted level " + level + "\n");
-        Terminal.WriteLine("Please enter your password: ");
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
+        Terminal.ClearScreen();
+        switch (level)
+        {
+            case 1:
+                password = level1Passwords[Random.Range(0, level1Passwords.Length)];
+                break;
+            case 2:
+                password = level2Passwords[Random.Range(0, level2Passwords.Length)];
+                print("hello");
+                break;
+            case 3:
+                password = level3Passwords[Random.Range(0, level3Passwords.Length)];
+                break;
+            default:
+                Debug.LogError("INVALID LEVEL NUMBER!");
+                break;
+        }
+        Terminal.WriteLine("Enter your password: ");
     }
 }
